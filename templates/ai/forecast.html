@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block header_title %}AI Smart Stock Depletion & Reorder Engine{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card card-custom p-4 bg-gradient border-warning">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon warning" style="width: 60px; height: 60px; font-size: 2rem;">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold text-light m-0">Predictive Stock Analytics</h4>
+                    <p class="text-muted m-0">Powered by statistical sales velocity algorithms. Automatically calculates days until stockout based on real-time sales history.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header">
+        <span>Stock Depletion & Intelligent Supplier Reorder Matrix</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-custom datatable align-middle">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Current Stock</th>
+                        <th>14-Day Sales</th>
+                        <th>Avg Daily Velocity</th>
+                        <th>Days Until Out</th>
+                        <th>Risk Level</th>
+                        <th>Suggested Reorder Qty</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in forecasts %}
+                    <tr>
+                        <td class="fw-bold text-light">{{ f.product.name }}</td>
+                        <td class="fw-bold">{{ f.product.stock_quantity }}</td>
+                        <td>{{ f.sold_14_days }} units</td>
+                        <td>{{ f.avg_daily_sales }}/day</td>
+                        <td class="fw-bold fs-6">
+                            {% if f.days_remaining <= 5 %}
+                            <span class="text-danger">{{ f.days_remaining }} Days</span>
+                            {% else %}
+                            <span class="text-success">{{ f.days_remaining }} Days</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if f.risk_level == 'HIGH' %}
+                            <span class="badge bg-danger">HIGH RISK</span>
+                            {% elif f.risk_level == 'MEDIUM' %}
+                            <span class="badge bg-warning text-dark">MEDIUM RISK</span>
+                            {% else %}
+                            <span class="badge bg-success">HEALTHY</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold text-warning">+{{ f.suggested_reorder }} units</td>
+                        <td class="text-end">
+                            <a href="{% url 'purchase_create' %}" class="btn btn-sm btn-primary fw-bold"><i class="bi bi-cart-plus me-1"></i> Order Now</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No product velocity data available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

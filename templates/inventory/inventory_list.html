@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Stock Movements & Inventory Log{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex gap-2">
+        <a href="{% url 'stock_movement_create' %}" class="btn btn-primary fw-bold">
+            <i class="bi bi-arrow-down-up me-1"></i> New Stock Movement
+        </a>
+        <a href="{% url 'warehouses_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-building me-1"></i> Warehouses
+        </a>
+    </div>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header">
+        <span>Stock Audit Log</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-custom datatable align-middle">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Ref #</th>
+                        <th>Branch</th>
+                        <th>User</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in movements %}
+                    <tr>
+                        <td>{{ m.created_at|date:"M d, Y H:i" }}</td>
+                        <td class="fw-bold text-light">{{ m.product.name }}</td>
+                        <td>
+                            {% if m.movement_type == 'IN' %}
+                            <span class="badge bg-success">STOCK IN</span>
+                            {% elif m.movement_type == 'OUT' %}
+                            <span class="badge bg-danger">STOCK OUT</span>
+                            {% else %}
+                            <span class="badge bg-info">{{ m.get_movement_type_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold fs-6">{{ m.quantity }}</td>
+                        <td><code>{{ m.reference_number|default:"-" }}</code></td>
+                        <td>{{ m.branch.name|default:"HQ" }}</td>
+                        <td>{{ m.created_by.username|default:"System" }}</td>
+                        <td>{{ m.notes|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No inventory movements recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

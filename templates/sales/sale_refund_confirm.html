@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Confirm Sale Refund{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center pt-5">
+    <div class="col-md-6">
+        <div class="card card-custom p-4 text-center">
+            <div class="stat-icon warning mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2.5rem;">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </div>
+            <h4 class="fw-bold text-light mb-2">Process Refund & Return Stock?</h4>
+            <p class="text-muted">You are initiating a refund for Invoice <strong>#{{ sale.invoice_number }}</strong> (Total Amount: <strong>{{ currency_symbol }}{{ sale.total_amount }}</strong>).</p>
+            <p class="text-warning small">All item quantities will be automatically restored to SQLite product stock inventory.</p>
+
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <a href="{% url 'sale_detail' sale.pk %}" class="btn btn-outline-secondary px-4 me-2">Cancel</a>
+                <button type="submit" class="btn btn-warning text-dark fw-bold px-4">Confirm Refund</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block header_title %}System Alerts & Notifications{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header">
+        <span>Notifications Activity Center</span>
+    </div>
+    <div class="card-body">
+        <ul class="list-group list-group-flush bg-transparent">
+            {% for n in notifications %}
+            <li class="list-group-item bg-transparent border-secondary text-light d-flex justify-content-between align-items-center p-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        {% if n.notification_type == 'LOW_STOCK' %}
+                        <span class="badge bg-warning text-dark">LOW STOCK</span>
+                        {% elif n.notification_type == 'PURCHASE' %}
+                        <span class="badge bg-info">PURCHASE</span>
+                        {% else %}
+                        <span class="badge bg-primary">SYSTEM</span>
+                        {% endif %}
+                        <strong class="text-light fs-6">{{ n.title }}</strong>
+                        <small class="text-muted">({{ n.created_at|timesince }} ago)</small>
+                    </div>
+                    <div class="text-muted small">{{ n.message }}</div>
+                </div>
+                {% if not n.is_read %}
+                <a href="{% url 'mark_notification_read' n.pk %}" class="btn btn-sm btn-outline-primary">Mark as Read</a>
+                {% else %}
+                <span class="badge bg-secondary">Read</span>
+                {% endif %}
+            </li>
+            {% empty %}
+            <li class="p-4 text-center text-muted">No notifications in your inbox.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

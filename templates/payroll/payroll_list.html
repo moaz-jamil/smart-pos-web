@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Payroll & Salary Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <form method="post" action="{% url 'payroll_generate' %}" class="d-flex gap-2">
+        {% csrf_token %}
+        <select name="month" class="form-select">
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7" selected>July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+        <input type="number" name="year" class="form-control" value="2026" style="width: 100px;">
+        <button type="submit" class="btn btn-primary fw-bold text-nowrap"><i class="bi bi-cash-stack me-1"></i> Generate Monthly Payroll</button>
+    </form>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header">
+        <span>Employee Salary Records</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-custom datatable align-middle">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Month / Year</th>
+                        <th>Base Salary</th>
+                        <th>Bonus</th>
+                        <th>Deductions</th>
+                        <th>Net Salary</th>
+                        <th>Status</th>
+                        <th class="text-end">Payslip</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payrolls %}
+                    <tr>
+                        <td class="fw-bold text-light">{{ p.employee.get_full_name|default:p.employee.username }}</td>
+                        <td>{{ p.month }}/{{ p.year }}</td>
+                        <td>{{ currency_symbol }}{{ p.base_salary|floatformat:2 }}</td>
+                        <td class="text-success">+{{ currency_symbol }}{{ p.bonus|floatformat:2 }}</td>
+                        <td class="text-danger">-{{ currency_symbol }}{{ p.deductions|floatformat:2 }}</td>
+                        <td class="fw-bold text-success fs-6">{{ currency_symbol }}{{ p.net_salary|floatformat:2 }}</td>
+                        <td><span class="badge bg-success">PAID</span></td>
+                        <td class="text-end">
+                            <a href="{% url 'payslip_detail' p.pk %}" class="btn btn-sm btn-outline-info"><i class="bi bi-file-earmark-text"></i> View Slip</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No payroll records generated yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

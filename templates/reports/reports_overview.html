@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Financial Analytics & Report Exports{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card">
+            <span class="text-muted small fw-bold text-uppercase">Total Sales Revenue</span>
+            <h3 class="fw-bold text-success mt-1 mb-0">{{ currency_symbol }}{{ sales_total|floatformat:2 }}</h3>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card">
+            <span class="text-muted small fw-bold text-uppercase">Total Purchases Cost</span>
+            <h3 class="fw-bold text-primary mt-1 mb-0">{{ currency_symbol }}{{ purchases_total|floatformat:2 }}</h3>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card">
+            <span class="text-muted small fw-bold text-uppercase">Total Operating Expenses</span>
+            <h3 class="fw-bold text-danger mt-1 mb-0">{{ currency_symbol }}{{ expenses_total|floatformat:2 }}</h3>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card">
+            <span class="text-muted small fw-bold text-uppercase">Net Estimated Profit</span>
+            <h3 class="fw-bold text-info mt-1 mb-0">{{ currency_symbol }}{{ net_profit|floatformat:2 }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Sales Export Card -->
+    <div class="col-md-6">
+        <div class="card card-custom p-4">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="stat-icon success" style="width: 55px; height: 55px;"><i class="bi bi-file-earmark-spreadsheet-fill fs-2"></i></div>
+                <div>
+                    <h5 class="fw-bold text-light m-0">Sales Transactions Report</h5>
+                    <p class="text-muted small m-0">Complete POS sale records with item totals, tax, and cashier details.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'export_excel_sales' %}" class="btn btn-success fw-bold flex-grow-1"><i class="bi bi-file-earmark-excel me-1"></i> Export Excel (.xlsx)</a>
+                <a href="{% url 'export_pdf_sales' %}" class="btn btn-danger fw-bold flex-grow-1"><i class="bi bi-file-earmark-pdf me-1"></i> Export PDF</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Audit Export Card -->
+    <div class="col-md-6">
+        <div class="card card-custom p-4">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="stat-icon primary" style="width: 55px; height: 55px;"><i class="bi bi-box-seam-fill fs-2"></i></div>
+                <div>
+                    <h5 class="fw-bold text-light m-0">Inventory Stock Audit Report</h5>
+                    <p class="text-muted small m-0">Full stock audit list with purchase costs, selling prices, and low stock warnings.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'export_excel_inventory' %}" class="btn btn-success fw-bold flex-grow-1"><i class="bi bi-file-earmark-excel me-1"></i> Export Excel (.xlsx)</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

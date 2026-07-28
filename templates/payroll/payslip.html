@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Salary Payslip - {{ payroll.employee.username }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center pt-4">
+    <div class="col-md-7">
+        <div class="card card-custom p-4">
+            <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4">
+                <div>
+                    <h4 class="fw-bold text-light mb-1">{{ payroll.business.name|default:"SmartPOS Retail" }}</h4>
+                    <p class="text-muted small m-0">Official Salary Payslip Statement</p>
+                </div>
+                <div class="text-end">
+                    <h5 class="fw-bold text-success mb-1">PAYSLIP</h5>
+                    <div class="text-muted small">Period: {{ payroll.month }}/{{ payroll.year }}</div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-6">
+                    <div class="text-muted small">Employee Name:</div>
+                    <div class="fw-bold text-light fs-5">{{ payroll.employee.get_full_name|default:payroll.employee.username }}</div>
+                    <div class="text-muted small">Designation: {{ payroll.employee.employee_profile.designation|default:"Staff" }}</div>
+                </div>
+                <div class="col-6 text-end">
+                    <div class="text-muted small">Payment Date:</div>
+                    <div class="fw-bold text-light">{{ payroll.created_at|date:"M d, Y" }}</div>
+                    <div class="badge bg-success">Status: PAID</div>
+                </div>
+            </div>
+
+            <table class="table table-custom mb-4 align-middle">
+                <thead>
+                    <tr>
+                        <th>Earnings & Deductions Component</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-light">Base Salary</td>
+                        <td class="text-end text-light fw-semibold">{{ currency_symbol }}{{ payroll.base_salary|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-success">Performance Bonus</td>
+                        <td class="text-end text-success">+{{ currency_symbol }}{{ payroll.bonus|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-danger">Tax & Pension Deductions</td>
+                        <td class="text-end text-danger">-{{ currency_symbol }}{{ payroll.deductions|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="border-top border-secondary fs-5 fw-bold">
+                        <td class="text-primary">NET PAYABLE SALARY</td>
+                        <td class="text-end text-success">{{ currency_symbol }}{{ payroll.net_salary|floatformat:2 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-between pt-3 border-top border-secondary no-print">
+                <a href="{% url 'payroll_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Back to Payroll</a>
+                <button class="btn btn-primary fw-bold" onclick="window.print()"><i class="bi bi-printer me-1"></i> Print Payslip</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

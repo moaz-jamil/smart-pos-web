@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block header_title %}User Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center pt-4">
+    <div class="col-lg-6">
+        <div class="card card-custom p-4">
+            <div class="d-flex align-items-center gap-3 mb-4 border-bottom border-secondary pb-3">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-3" style="width: 70px; height: 70px;">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <h4 class="fw-bold text-light mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                    <span class="badge bg-info text-uppercase">{{ user.get_role_display }}</span>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-semibold">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-semibold">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-semibold">Email Address</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-semibold">Phone Number</label>
+                        {{ form.phone }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted small fw-semibold">Profile Picture</label>
+                        {{ form.profile_picture }}
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top border-secondary text-end">
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Save Profile Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

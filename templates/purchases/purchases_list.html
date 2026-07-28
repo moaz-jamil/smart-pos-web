@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Purchase Orders (POs){% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="{% url 'purchase_create' %}" class="btn btn-primary fw-bold">
+        <i class="bi bi-plus-lg me-1"></i> Create Purchase Order
+    </a>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header">
+        <span>Supplier PO Directory</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-custom datatable align-middle">
+                <thead>
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Supplier</th>
+                        <th>Date</th>
+                        <th>Total Cost</th>
+                        <th>Paid Amount</th>
+                        <th>Payment Status</th>
+                        <th>Received Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for po in purchases %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ po.invoice_number }}</td>
+                        <td><div class="fw-bold text-light">{{ po.supplier.company_name }}</div></td>
+                        <td>{{ po.created_at|date:"M d, Y" }}</td>
+                        <td class="fw-bold text-light">{{ currency_symbol }}{{ po.total_amount|floatformat:2 }}</td>
+                        <td>{{ currency_symbol }}{{ po.paid_amount|floatformat:2 }}</td>
+                        <td><span class="badge bg-info">{{ po.get_payment_status_display }}</span></td>
+                        <td><span class="badge bg-success">{{ po.get_received_status_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No purchase orders created.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

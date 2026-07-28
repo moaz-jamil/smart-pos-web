@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Purchase Orders History - {{ supplier.company_name }}{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Purchases from {{ supplier.company_name }}</span>
+        <a href="{% url 'suppliers_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Back to Suppliers</a>
+    </div>
+    <div class="table-responsive p-3">
+        <table class="table table-custom datatable align-middle">
+            <thead>
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Date</th>
+                    <th>Total Cost</th>
+                    <th>Paid</th>
+                    <th>Payment Status</th>
+                    <th>Delivery Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for po in purchases %}
+                <tr>
+                    <td class="fw-bold text-primary">{{ po.invoice_number }}</td>
+                    <td>{{ po.created_at|date:"M d, Y" }}</td>
+                    <td class="fw-bold text-light">{{ currency_symbol }}{{ po.total_amount|floatformat:2 }}</td>
+                    <td>{{ currency_symbol }}{{ po.paid_amount|floatformat:2 }}</td>
+                    <td><span class="badge bg-info">{{ po.get_payment_status_display }}</span></td>
+                    <td><span class="badge bg-success">{{ po.get_received_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">No purchase orders recorded for this supplier.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

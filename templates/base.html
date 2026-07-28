@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartPOS Enterprise{% endblock %} - Point of Sale & Inventory</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-shop"></i>
+            <span>SmartPOS <span class="badge bg-primary text-uppercase" style="font-size: 0.65rem;">Pro</span></span>
+        </div>
+
+        <div class="p-3 pb-0">
+            <a href="{% url 'pos_terminal' %}" class="nav-link pos-btn text-center justify-content-center py-2 rounded-3">
+                <i class="bi bi-cart-check-fill fs-5 me-2"></i>
+                <span class="fw-bold">OPEN POS TERMINAL</span>
+            </a>
+        </div>
+
+        <ul class="sidebar-nav mt-3">
+            <li class="nav-item">
+                <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <div class="nav-label">Core Operations</div>
+            <li class="nav-item">
+                <a href="{% url 'sales_list' %}" class="nav-link {% if 'sales' in request.path %}active{% endif %}">
+                    <i class="bi bi-receipt"></i>
+                    <span>Sales & Invoices</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'products_list' %}" class="nav-link {% if 'products' in request.path %}active{% endif %}">
+                    <i class="bi bi-box-seam-fill"></i>
+                    <span>Products & Stock</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'inventory_list' %}" class="nav-link {% if 'inventory' in request.path %}active{% endif %}">
+                    <i class="bi bi-arrow-down-up"></i>
+                    <span>Stock Movements</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'purchases_list' %}" class="nav-link {% if 'purchases' in request.path %}active{% endif %}">
+                    <i class="bi bi-truck"></i>
+                    <span>Purchases (POs)</span>
+                </a>
+            </li>
+
+            <div class="nav-label">People & Relations</div>
+            <li class="nav-item">
+                <a href="{% url 'customers_list' %}" class="nav-link {% if 'customers' in request.path %}active{% endif %}">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Customers</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'suppliers_list' %}" class="nav-link {% if 'suppliers' in request.path %}active{% endif %}">
+                    <i class="bi bi-building"></i>
+                    <span>Suppliers</span>
+                </a>
+            </li>
+            
+            {% if user.is_admin %}
+            <div class="nav-label">HRM & Financials</div>
+            <li class="nav-item">
+                <a href="{% url 'employees_list' %}" class="nav-link {% if 'employees' in request.path %}active{% endif %}">
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>Employees</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'attendance_list' %}" class="nav-link {% if 'attendance' in request.path %}active{% endif %}">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Attendance Log</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'payroll_list' %}" class="nav-link {% if 'payroll' in request.path %}active{% endif %}">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Payroll</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'expenses_list' %}" class="nav-link {% if 'expenses' in request.path %}active{% endif %}">
+                    <i class="bi bi-wallet2"></i>
+                    <span>Expenses</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'reports_overview' %}" class="nav-link {% if 'reports' in request.path %}active{% endif %}">
+                    <i class="bi bi-bar-chart-line-fill"></i>
+                    <span>Reports & PDF/Excel</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'ai_forecast' %}" class="nav-link {% if 'ai' in request.path %}active{% endif %}">
+                    <i class="bi bi-robot text-warning"></i>
+                    <span>AI Stock Forecast</span>
+                </a>
+            </li>
+            {% endif %}
+
+            <div class="nav-label">System & Settings</div>
+            {% if user.is_admin %}
+            <li class="nav-item">
+                <a href="{% url 'branches_list' %}" class="nav-link {% if 'branches' in request.path %}active{% endif %}">
+                    <i class="bi bi-diagram-3-fill"></i>
+                    <span>Branches</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'settings_detail' %}" class="nav-link {% if 'settings' in request.path %}active{% endif %}">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Business Settings</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if user.is_super_admin %}
+            <li class="nav-item">
+                <a href="{% url 'subscriptions_list' %}" class="nav-link {% if 'subscriptions' in request.path %}active{% endif %}">
+                    <i class="bi bi-stars text-info"></i>
+                    <span>SaaS Subscriptions</span>
+                </a>
+            </li>
+            {% endif %}
+
+            <li class="nav-item mt-4 mb-5">
+                <a href="{% url 'logout' %}" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div id="main-content">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-outline-secondary d-md-none" id="toggle-sidebar">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="fw-semibold text-light fs-5">
+                    {% block header_title %}{{ current_business.name|default:"SmartPOS Enterprise" }}{% endblock %}
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <!-- Notifications Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-dark position-relative border-secondary rounded-circle p-2" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell-fill fs-5 text-muted"></i>
+                        {% if unread_notifications_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ unread_notifications_count }}
+                        </span>
+                        {% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-2" style="width: 320px;">
+                        <h6 class="dropdown-header border-bottom border-secondary pb-2 mb-2">Notifications</h6>
+                        {% for notif in header_notifications %}
+                        <li class="mb-2">
+                            <a class="dropdown-item rounded small text-wrap p-2 bg-secondary bg-opacity-10" href="{% url 'notifications_list' %}">
+                                <div class="fw-bold text-light">{{ notif.title }}</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">{{ notif.message|truncatewords:8 }}</div>
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li class="text-center text-muted p-2">No new notifications</li>
+                        {% endfor %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center text-primary fw-bold" href="{% url 'notifications_list' %}">View All Notifications</a></li>
+                    </ul>
+                </div>
+
+                <!-- User Profile -->
+                <div class="dropdown">
+                    <button class="btn btn-dark d-flex align-items-center gap-2 border-secondary rounded-pill pe-3" type="button" data-bs-toggle="dropdown">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 35px; height: 35px;">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                        <div class="text-start d-none d-sm-block">
+                            <div class="fw-semibold text-light" style="font-size: 0.85rem; line-height: 1.2;">{{ user.get_full_name|default:user.username }}</div>
+                            <div class="text-muted" style="font-size: 0.725rem;">{{ user.get_role_display }}</div>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="{% url 'user_profile' %}"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                        {% if user.is_admin %}
+                        <li><a class="dropdown-item" href="{% url 'settings_detail' %}"><i class="bi bi-sliders me-2"></i>Settings</a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        <div class="container-fluid pt-3 px-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Page Body Content -->
+        <main class="container-fluid px-4 pb-5 flex-grow-1">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTables with Dark Theme Support
+            $('.datatable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search records..."
+                }
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

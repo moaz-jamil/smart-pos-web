@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Staff & Employee Management{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold text-light mb-3">Add Employee</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Username *</label>
+                    <input type="text" name="username" class="form-control" placeholder="e.g. cashier_john" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Email</label>
+                    <input type="email" name="email" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Password *</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Designation</label>
+                    <input type="text" name="designation" class="form-control" value="POS Cashier">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Base Monthly Salary ({{ currency_symbol }})</label>
+                    <input type="number" name="salary" class="form-control" value="3000">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Save Employee</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header">
+                <span>Employee Staff Directory</span>
+            </div>
+            <div class="table-responsive p-3">
+                <table class="table table-custom datatable align-middle">
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Designation</th>
+                            <th>Branch</th>
+                            <th>Base Salary</th>
+                            <th>Joined Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emp in employees %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-light">{{ emp.user.get_full_name|default:emp.user.username }}</div>
+                                <small class="text-muted">{{ emp.user.email }}</small>
+                            </td>
+                            <td><span class="badge bg-secondary">{{ emp.designation }}</span></td>
+                            <td>{{ emp.user.branch.name|default:"HQ" }}</td>
+                            <td class="fw-bold text-success">{{ currency_symbol }}{{ emp.salary|floatformat:2 }}</td>
+                            <td>{{ emp.join_date }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No employees registered yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

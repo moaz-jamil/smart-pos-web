@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Product Categories{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Form Col -->
+    <div class="col-md-4">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold text-light mb-3">Add Category</h5>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Category Name *</label>
+                    {{ form.name }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Description</label>
+                    {{ form.description }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Image</label>
+                    {{ form.image }}
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Save Category</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Col -->
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header">
+                <span>Categories List</span>
+            </div>
+            <div class="table-responsive p-3">
+                <table class="table table-custom datatable align-middle">
+                    <thead>
+                        <tr>
+                            <th>Category Name</th>
+                            <th>Description</th>
+                            <th>Products Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cat in categories %}
+                        <tr>
+                            <td class="fw-bold text-light">{{ cat.name }}</td>
+                            <td>{{ cat.description|default:"-" }}</td>
+                            <td><span class="badge bg-info">{{ cat.products.count }} Products</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">No categories created yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales History{% endblock %}
+{% block header_title %}Sales & Invoice Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex gap-2">
+        <a href="{% url 'pos_terminal' %}" class="btn btn-success fw-bold">
+            <i class="bi bi-cart-plus me-1"></i> New POS Sale
+        </a>
+        <a href="{% url 'coupons_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-ticket-perforated me-1"></i> Coupons
+        </a>
+    </div>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header">
+        <span>Completed Invoices</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-custom datatable align-middle">
+                <thead>
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Date & Time</th>
+                        <th>Customer</th>
+                        <th>Cashier</th>
+                        <th>Payment Method</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ sale.invoice_number }}</td>
+                        <td>{{ sale.created_at|date:"M d, Y H:i" }}</td>
+                        <td>{{ sale.customer.name|default:"Walk-in Customer" }}</td>
+                        <td>{{ sale.cashier.username|default:"System" }}</td>
+                        <td><span class="badge bg-secondary">{{ sale.get_payment_method_display }}</span></td>
+                        <td class="fw-bold text-success">{{ currency_symbol }}{{ sale.total_amount|floatformat:2 }}</td>
+                        <td>
+                            {% if sale.payment_status == 'PAID' %}
+                            <span class="badge bg-success">PAID</span>
+                            {% elif sale.payment_status == 'REFUNDED' %}
+                            <span class="badge bg-danger">REFUNDED</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">{{ sale.payment_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'sale_detail' sale.pk %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-eye"></i> View Invoice</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No sales records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

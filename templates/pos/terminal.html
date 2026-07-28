@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+
+{% block title %}POS Terminal{% endblock %}
+{% block header_title %}SmartPOS Interactive Terminal{% endblock %}
+
+{% block content %}
+<div class="row g-3" style="min-height: calc(100vh - 100px);">
+    <!-- Left Column: Search & Product Selection Grid -->
+    <div class="col-lg-7 d-flex flex-column">
+        <!-- Search & Filter Bar -->
+        <div class="card card-custom p-3 mb-3">
+            <div class="row g-2">
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" id="pos-search-input" class="form-control form-control-lg" placeholder="Scan Barcode or Search Product..." autofocus>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <select id="pos-category-filter" class="form-select form-select-lg">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid Container -->
+        <div class="card card-custom flex-grow-1 p-3 overflow-auto" style="max-height: 70vh;">
+            <div class="row g-3" id="products-grid">
+                {% for p in products %}
+                <div class="col-xl-3 col-md-4 col-sm-6">
+                    <div class="product-card h-100" onclick="addToCart({{ p.id }}, '{{ p.name|escapejs }}', {{ p.selling_price }}, {{ p.stock_quantity }}, {{ p.tax_rate }})">
+                        {% if p.image %}
+                        <img src="{{ p.image.url }}" class="product-thumb mb-2" alt="{{ p.name }}">
+                        {% else %}
+                        <div class="product-thumb mb-2 d-flex align-items-center justify-content-center text-muted">
+                            <i class="bi bi-box-seam fs-1"></i>
+                        </div>
+                        {% endif %}
+                        <div class="fw-bold text-light text-truncate" style="font-size: 0.875rem;">{{ p.name }}</div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="fw-bold text-success">{{ currency_symbol }}{{ p.selling_price|floatformat:2 }}</span>
+                            <span class="badge {% if p.is_low_stock %}bg-danger{% else %}bg-secondary{% endif %}">Qty: {{ p.stock_quantity }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center text-muted py-5">
+                    <i class="bi bi-inbox fs-1 mb-2"></i>
+                    <p>No products available in this category.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Interactive Cart & Checkout Panel -->
+    <div class="col-lg-5 d-flex flex-column">
+        <div class="card card-custom h-100 p-3 d-flex flex-column">
+            <!-- Customer Selection -->
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-semibold">Select Customer</label>
+                <div class="input-group">
+                    <select id="cart-customer-id" class="form-select">
+                        <option value="">Walk-in Customer (Default)</option>
+                        {% for c in customers %}
+                        <option value="{{ c.id }}">{{ c.name }} ({{ c.phone }})</option>
+                        {% endfor %}
+                    </select>
+                    <a href="{% url 'customers_list' %}" target="_blank" class="btn btn-outline-secondary" title="Add Customer"><i class="bi bi-person-plus"></i></a>
+                </div>
+            </div>
+
+            <!-- Cart Table Items -->
+            <div class="flex-grow-1 overflow-auto border-top border-bottom border-secondary py-2 mb-3" style="min-height: 250px; max-height: 40vh;">
+                <table class="table table-custom table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items-body">
+                        <!-- Dynamic Cart Rows Injected Here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary Breakdown -->
+            <div class="bg-dark p-3 rounded mb-3">
+                <div class="d-flex justify-content-between text-muted mb-1 small">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal" class="fw-semibold text-light">{{ currency_symbol }}0.00</span>
+                </div>
+                <div class="d-flex justify-content-between text-muted mb-1 small">
+                    <span>Tax Total ({{ tax_rate }}%)</span>
+                    <span id="summary-tax" class="fw-semibold text-light">{{ currency_symbol }}0.00</span>
+                </div>
+                <div class="d-flex justify-content-between text-muted mb-2 small">
+                    <span>Discount</span>
+                    <span id="summary-discount" class="fw-semibold text-danger">-{{ currency_symbol }}0.00</span>
+                </div>
+
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <input type="text" id="coupon-code-input" class="form-control form-control-sm" placeholder="Coupon Code">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" id="manual-discount-input" class="form-control form-control-sm" placeholder="Manual Disc {{ currency_symbol }}" min="0" step="0.5">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary">
+                    <span class="fs-5 fw-bold text-light">TOTAL PAYABLE</span>
+                    <span id="summary-total" class="fs-3 fw-bold text-success">{{ currency_symbol }}0.00</span>
+                </div>
+            </div>
+
+            <!-- Payment Method & Checkout Trigger -->
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-semibold">Payment Method</label>
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="payment-method" id="pay-cash" value="CASH" checked>
+                    <label class="btn btn-outline-success fw-bold" for="pay-cash"><i class="bi bi-cash me-1"></i> Cash</label>
+
+                    <input type="radio" class="btn-check" name="payment-method" id="pay-card" value="CARD">
+                    <label class="btn btn-outline-info fw-bold" for="pay-card"><i class="bi bi-credit-card me-1"></i> Card</label>
+
+                    <input type="radio" class="btn-check" name="payment-method" id="pay-split" value="SPLIT">
+                    <label class="btn btn-outline-warning fw-bold" for="pay-split"><i class="bi bi-arrows-split me-1"></i> Split</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <input type="number" id="amount-paid-input" class="form-control form-control-lg text-center fw-bold" placeholder="Amount Paid by Customer">
+            </div>
+
+            <button type="button" onclick="processCheckout()" class="btn btn-success btn-lg w-100 py-3 fw-bold text-uppercase rounded-3">
+                <i class="bi bi-check2-circle me-2"></i> COMPLETE SALE & PRINT RECEIPT
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="modal fade" id="receiptModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+        <div class="modal-content bg-light text-dark p-3" id="printable-receipt">
+            <div class="text-center mb-3">
+                <h4 class="fw-bold m-0">{{ current_business.name|default:"SmartPOS Retail" }}</h4>
+                <div class="small text-muted">{{ business_setting.receipt_header|linebreaksbr }}</div>
+                <hr class="my-2">
+                <div class="d-flex justify-content-between small">
+                    <span>Inv #: <strong id="rec-inv"></strong></span>
+                    <span id="rec-date"></span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                    <span>Cashier: <strong id="rec-cashier"></strong></span>
+                    <span>Customer: <strong id="rec-customer"></strong></span>
+                </div>
+            </div>
+
+            <table class="table table-sm text-dark align-middle mb-2 small">
+                <thead>
+                    <tr class="border-bottom border-dark">
+                        <th>Item</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="rec-items-body"></tbody>
+            </table>
+
+            <div class="border-top border-dark pt-2 small">
+                <div class="d-flex justify-content-between"><span>Subtotal:</span><span id="rec-subtotal"></span></div>
+                <div class="d-flex justify-content-between"><span>Tax:</span><span id="rec-tax"></span></div>
+                <div class="d-flex justify-content-between"><span>Discount:</span><span id="rec-discount"></span></div>
+                <div class="d-flex justify-content-between fw-bold fs-6 border-top border-dark pt-1">
+                    <span>GRAND TOTAL:</span><span id="rec-total"></span>
+                </div>
+                <div class="d-flex justify-content-between text-muted"><span>Amount Paid:</span><span id="rec-paid"></span></div>
+                <div class="d-flex justify-content-between text-muted"><span>Change:</span><span id="rec-change"></span></div>
+            </div>
+
+            <div class="text-center mt-3 pt-2 border-top border-dark small">
+                <p class="m-0">{{ business_setting.receipt_footer|linebreaksbr }}</p>
+                <small class="text-muted">Powered by SmartPOS Pro</small>
+            </div>
+
+            <div class="mt-3 text-center no-print">
+                <button class="btn btn-primary btn-sm fw-bold px-4 me-2" onclick="window.print()"><i class="bi bi-printer me-1"></i> Print</button>
+                <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let cart = [];
+    const taxRateDefault = {{ tax_rate }};
+
+    function addToCart(id, name, price, stock, taxRate) {
+        let existing = cart.find(item => item.id === id);
+        if (existing) {
+            if (existing.quantity >= stock) {
+                Swal.fire({ icon: 'warning', title: 'Stock Limit Reached', text: `Only ${stock} units available in stock.` });
+                return;
+            }
+            existing.quantity += 1;
+        } else {
+            if (stock < 1) {
+                Swal.fire({ icon: 'error', title: 'Out of Stock', text: 'This item is out of stock!' });
+                return;
+            }
+            cart.push({ id: id, name: name, price: price, quantity: 1, stock: stock, taxRate: taxRate });
+        }
+        renderCart();
+    }
+
+    function updateCartQty(id, delta) {
+        let item = cart.find(i => i.id === id);
+        if (!item) return;
+        item.quantity += delta;
+        if (item.quantity > item.stock) {
+            item.quantity = item.stock;
+            Swal.fire({ icon: 'warning', title: 'Max Stock', text: `Maximum stock quantity is ${item.stock}.` });
+        }
+        if (item.quantity <= 0) {
+            cart = cart.filter(i => i.id !== id);
+        }
+        renderCart();
+    }
+
+    function removeFromCart(id) {
+        cart = cart.filter(i => i.id !== id);
+        renderCart();
+    }
+
+    function renderCart() {
+        const body = $('#cart-items-body');
+        body.empty();
+
+        let subtotal = 0;
+        let taxTotal = 0;
+
+        cart.forEach(item => {
+            let itemSubtotal = item.price * item.quantity;
+            let itemTax = (itemSubtotal * item.taxRate) / 100;
+            subtotal += itemSubtotal;
+            taxTotal += itemTax;
+
+            body.append(`
+                <tr>
+                    <td class="fw-semibold text-light">${item.name}</td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-dark border-secondary text-light px-2" onclick="updateCartQty(${item.id}, -1)">-</button>
+                            <span class="btn btn-dark border-secondary text-light px-2 fw-bold" style="pointer-events:none;">${item.quantity}</span>
+                            <button class="btn btn-dark border-secondary text-light px-2" onclick="updateCartQty(${item.id}, 1)">+</button>
+                        </div>
+                    </td>
+                    <td class="text-end text-muted">${item.price.toFixed(2)}</td>
+                    <td class="text-end fw-bold text-light">${itemSubtotal.toFixed(2)}</td>
+                    <td class="text-end"><button class="btn btn-sm text-danger" onclick="removeFromCart(${item.id})"><i class="bi bi-x-circle"></i></button></td>
+                </tr>
+            `);
+        });
+
+        let manualDisc = parseFloat($('#manual-discount-input').val()) || 0;
+        let total = subtotal + taxTotal - manualDisc;
+
+        $('#summary-subtotal').text(`{{ currency_symbol }}${subtotal.toFixed(2)}`);
+        $('#summary-tax').text(`{{ currency_symbol }}${taxTotal.toFixed(2)}`);
+        $('#summary-discount').text(`-{{ currency_symbol }}${manualDisc.toFixed(2)}`);
+        $('#summary-total').text(`{{ currency_symbol }}${total.toFixed(2)}`);
+    }
+
+    $('#manual-discount-input, #coupon-code-input').on('input change', function() {
+        renderCart();
+    });
+
+    // Barcode Search Live Filter
+    $('#pos-search-input').on('keyup', function(e) {
+        let query = $(this).val().trim();
+        let catId = $('#pos-category-filter').val();
+
+        if (e.key === 'Enter' && query.length > 0) {
+            // Auto add exact barcode match
+            $.get('{% url "pos_search_api" %}', { q: query }, function(res) {
+                if (res.status === 'success' && res.products.length === 1) {
+                    let p = res.products[0];
+                    addToCart(p.id, p.name, p.price, p.stock, p.tax_rate);
+                    $('#pos-search-input').val('');
+                }
+            });
+            return;
+        }
+
+        // Live grid search
+        $.get('{% url "pos_search_api" %}', { q: query, category_id: catId }, function(res) {
+            if (res.status === 'success') {
+                const grid = $('#products-grid');
+                grid.empty();
+                if (res.products.length === 0) {
+                    grid.append('<div class="col-12 text-center text-muted py-5"><p>No matching products found.</p></div>');
+                    return;
+                }
+                res.products.forEach(p => {
+                    let imgHtml = p.image_url ? `<img src="${p.image_url}" class="product-thumb mb-2">` : `<div class="product-thumb mb-2 d-flex align-items-center justify-content-center text-muted"><i class="bi bi-box-seam fs-1"></i></div>`;
+                    grid.append(`
+                        <div class="col-xl-3 col-md-4 col-sm-6">
+                            <div class="product-card h-100" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, ${p.stock}, ${p.tax_rate})">
+                                ${imgHtml}
+                                <div class="fw-bold text-light text-truncate" style="font-size: 0.875rem;">${p.name}</div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="fw-bold text-success">{{ currency_symbol }}${p.price.toFixed(2)}</span>
+                                    <span class="badge ${p.stock <= 5 ? 'bg-danger' : 'bg-secondary'}">Qty: ${p.stock}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+        });
+    });
+
+    $('#pos-category-filter').on('change', function() {
+        $('#pos-search-input').trigger('keyup');
+    });
+
+    function processCheckout() {
+        if (cart.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'Empty Cart', text: 'Please add products to cart before checkout.' });
+            return;
+        }
+
+        let paidAmount = parseFloat($('#amount-paid-input').val());
+        let totalVal = parseFloat($('#summary-total').text().replace(/[^0-9.-]+/g,""));
+
+        if (isNaN(paidAmount) || paidAmount <= 0) {
+            paidAmount = totalVal; // Default to exact amount
+        }
+
+        let payload = {
+            items: cart,
+            customer_id: $('#cart-customer-id').val(),
+            payment_method: $('input[name="payment-method"]:checked').val(),
+            paid_amount: paidAmount,
+            discount_amount: parseFloat($('#manual-discount-input').val()) || 0,
+            coupon_code: $('#coupon-code-input').val()
+        };
+
+        $.ajax({
+            url: '{% url "pos_checkout_api" %}',
+            type: 'POST',
+            data: JSON.stringify(payload),
+            contentType: 'application/json',
+            success: function(res) {
+                if (res.status === 'success') {
+                    // Populate Receipt Modal
+                    $('#rec-inv').text(res.invoice_number);
+                    $('#rec-date').text(res.date);
+                    $('#rec-cashier').text(res.cashier);
+                    $('#rec-customer').text(res.customer_name);
+                    $('#rec-subtotal').text(`{{ currency_symbol }}${res.subtotal.toFixed(2)}`);
+                    $('#rec-tax').text(`{{ currency_symbol }}${res.tax.toFixed(2)}`);
+                    $('#rec-discount').text(`{{ currency_symbol }}${res.discount.toFixed(2)}`);
+                    $('#rec-total').text(`{{ currency_symbol }}${res.total.toFixed(2)}`);
+                    $('#rec-paid').text(`{{ currency_symbol }}${res.paid.toFixed(2)}`);
+                    $('#rec-change').text(`{{ currency_symbol }}${res.change.toFixed(2)}`);
+
+                    let recItemsBody = $('#rec-items-body');
+                    recItemsBody.empty();
+                    res.items.forEach(i => {
+                        recItemsBody.append(`
+                            <tr>
+                                <td>${i.name}</td>
+                                <td class="text-center">${i.qty}</td>
+                                <td class="text-end">{{ currency_symbol }}${i.subtotal.toFixed(2)}</td>
+                            </tr>
+                        `);
+                    });
+
+                    // Clear Cart & Show Modal
+                    cart = [];
+                    renderCart();
+                    $('#amount-paid-input').val('');
+                    let modal = new bootstrap.Modal(document.getElementById('receiptModal'));
+                    modal.show();
+                }
+            },
+            error: function(err) {
+                let msg = err.responseJSON ? err.responseJSON.message : 'Checkout failed';
+                Swal.fire({ icon: 'error', title: 'Transaction Failed', text: msg });
+            }
+        });
+    }
+</script>
+{% endblock %}

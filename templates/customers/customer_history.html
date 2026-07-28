@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Purchase History - {{ customer.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <span class="text-muted small">Total Reward Points</span>
+            <h3 class="fw-bold text-warning mb-0"><i class="bi bi-star-fill me-2"></i>{{ customer.reward_points }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <span class="text-muted small">Wallet Credit Balance</span>
+            <h3 class="fw-bold text-success mb-0">{{ currency_symbol }}{{ customer.wallet_balance|floatformat:2 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <span class="text-muted small">Outstanding Debt</span>
+            <h3 class="fw-bold text-danger mb-0">{{ currency_symbol }}{{ customer.outstanding_balance|floatformat:2 }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Order Log for {{ customer.name }}</span>
+        <a href="{% url 'customers_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Back to Customers</a>
+    </div>
+    <div class="table-responsive p-3">
+        <table class="table table-custom datatable align-middle">
+            <thead>
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Date</th>
+                    <th>Payment Method</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th class="text-end">Invoice</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales %}
+                <tr>
+                    <td class="fw-bold text-primary">{{ sale.invoice_number }}</td>
+                    <td>{{ sale.created_at|date:"M d, Y H:i" }}</td>
+                    <td><span class="badge bg-secondary">{{ sale.get_payment_method_display }}</span></td>
+                    <td class="fw-bold text-success">{{ currency_symbol }}{{ sale.total_amount|floatformat:2 }}</td>
+                    <td><span class="badge bg-success">PAID</span></td>
+                    <td class="text-end">
+                        <a href="{% url 'sale_detail' sale.pk %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i> View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">No purchases recorded for this customer.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

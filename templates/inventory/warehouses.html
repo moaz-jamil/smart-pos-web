@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Warehouse Storage Locations{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold text-light mb-3">Add Warehouse</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Warehouse Name *</label>
+                    <input type="text" name="name" class="form-control" placeholder="e.g. Central Warehouse" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Location / Address</label>
+                    <textarea name="location" class="form-control" rows="2" placeholder="Facility location address"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Save Warehouse</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header">
+                <span>Warehouses Directory</span>
+            </div>
+            <div class="table-responsive p-3">
+                <table class="table table-custom datatable align-middle">
+                    <thead>
+                        <tr>
+                            <th>Warehouse Name</th>
+                            <th>Branch</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for w in warehouses %}
+                        <tr>
+                            <td class="fw-bold text-light">{{ w.name }}</td>
+                            <td>{{ w.branch.name|default:"HQ" }}</td>
+                            <td>{{ w.location|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">No warehouses created yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

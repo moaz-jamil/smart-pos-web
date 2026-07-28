@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block header_title %}SaaS Subscription Plans & Billing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center g-4 pt-3">
+    {% for p in plans %}
+    <div class="col-md-4">
+        <div class="card card-custom p-4 text-center h-100 d-flex flex-column justify-content-between border-primary">
+            <div>
+                <span class="badge bg-primary text-uppercase mb-2">Subscription Tier</span>
+                <h3 class="fw-bold text-light mb-3">{{ p.name }}</h3>
+                <h1 class="fw-bold text-success display-5">${{ p.price|floatformat:2 }}<span class="fs-6 text-muted">/mo</span></h1>
+                <p class="text-muted small mb-4">{{ p.description }}</p>
+
+                <ul class="list-unstyled text-start mb-4 text-muted small">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Up to <strong>{{ p.max_branches }}</strong> Branches</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Up to <strong>{{ p.max_users }}</strong> User Accounts</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Up to <strong>{{ p.max_products }}</strong> Products</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Full POS Terminal & Barcode Scanner</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Real-time Financial Reports & PDF/Excel Export</li>
+                </ul>
+            </div>
+
+            {% if active_sub and active_sub.plan == p %}
+            <button class="btn btn-success fw-bold w-100 disabled">CURRENT ACTIVE PLAN</button>
+            {% else %}
+            <button class="btn btn-outline-primary fw-bold w-100">Upgrade to {{ p.name }}</button>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

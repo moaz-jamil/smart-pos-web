@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Customer Relationship Management (CRM){% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Form Col -->
+    <div class="col-md-4">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold text-light mb-3">Add Customer</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Customer Name *</label>
+                    {{ form.name }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Phone Number *</label>
+                    {{ form.phone }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Email</label>
+                    {{ form.email }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold">Address</label>
+                    {{ form.address }}
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Save Customer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Col -->
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header">
+                <span>Customer Directory</span>
+            </div>
+            <div class="table-responsive p-3">
+                <table class="table table-custom datatable align-middle">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Reward Points</th>
+                            <th>Wallet</th>
+                            <th>Outstanding</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in customers %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-light">{{ c.name }}</div>
+                                <div class="text-muted small">{{ c.email|default:"No Email" }}</div>
+                            </td>
+                            <td>{{ c.phone }}</td>
+                            <td><span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>{{ c.reward_points }} pts</span></td>
+                            <td class="text-success fw-bold">{{ currency_symbol }}{{ c.wallet_balance|floatformat:2 }}</td>
+                            <td class="text-danger fw-bold">{{ currency_symbol }}{{ c.outstanding_balance|floatformat:2 }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'customer_history' c.pk %}" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-clock-history"></i> History</a>
+                                <a href="{% url 'customer_edit' c.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No customers registered.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
