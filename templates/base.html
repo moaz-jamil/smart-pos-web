@@ -20,6 +20,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <!-- Sidebar -->
     <aside id="sidebar">
@@ -265,6 +266,54 @@
                     zeroRecords: "No matching records found"
                 }
             });
+
+            // Sidebar Responsive Toggle & Scroll Position Memory
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggle-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (sidebar) {
+                // Restore saved scroll position
+                const savedScroll = sessionStorage.getItem('sidebar_scroll');
+                if (savedScroll !== null) {
+                    sidebar.scrollTop = parseInt(savedScroll, 10);
+                }
+
+                // Save scroll position when user scrolls sidebar
+                sidebar.addEventListener('scroll', function() {
+                    sessionStorage.setItem('sidebar_scroll', sidebar.scrollTop);
+                });
+
+                // Save scroll position on link click
+                $('.sidebar-nav .nav-link').on('click', function() {
+                    sessionStorage.setItem('sidebar_scroll', sidebar.scrollTop);
+                });
+
+                // Auto-scroll active module into view if off-screen
+                const activeLink = sidebar.querySelector('.nav-link.active');
+                if (activeLink) {
+                    const linkRect = activeLink.getBoundingClientRect();
+                    const sidebarRect = sidebar.getBoundingClientRect();
+                    if (linkRect.top < sidebarRect.top || linkRect.bottom > sidebarRect.bottom) {
+                        activeLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+                    }
+                }
+            }
+
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('active');
+                    if (overlay) overlay.classList.toggle('active');
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    if (sidebar) sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
         });
     </script>
 

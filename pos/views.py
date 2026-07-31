@@ -16,9 +16,9 @@ from settings_app.models import BusinessSetting
 @login_required
 def pos_terminal_view(request):
     business = request.user.get_business()
-    products = Product.objects.filter(business=business, status=True)
-    categories = Category.objects.filter(business=business, status=True)
-    customers = Customer.objects.filter(business=business, status=True)
+    products = Product.objects.filter(business=business)
+    categories = Category.objects.filter(business=business)
+    customers = Customer.objects.filter(business=business)
     setting = getattr(business, 'settings', None)
 
     context = {
@@ -36,7 +36,7 @@ def pos_product_search_api(request):
     category_id = request.GET.get('category_id')
 
     business = request.user.get_business()
-    products = Product.objects.filter(business=business, status=True)
+    products = Product.objects.filter(business=business)
 
     if category_id:
         products = products.filter(category_id=category_id)
