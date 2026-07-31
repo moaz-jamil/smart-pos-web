@@ -6,8 +6,8 @@ from products.forms import ProductForm, CategoryForm, BrandForm
 
 @login_required
 def products_list(request):
-    business = request.user.business
-    products = Product.objects.filter(business=business) if business else Product.objects.all()
+    business = request.user.get_business()
+    products = Product.objects.filter(business=business)
 
     category_id = request.GET.get('category')
     if category_id:
@@ -17,8 +17,8 @@ def products_list(request):
     if brand_id:
         products = products.filter(brand_id=brand_id)
 
-    categories = Category.objects.filter(business=business) if business else Category.objects.all()
-    brands = Brand.objects.filter(business=business) if business else Brand.objects.all()
+    categories = Category.objects.filter(business=business)
+    brands = Brand.objects.filter(business=business)
 
     return render(request, 'products/products_list.html', {
         'products': products,
@@ -29,15 +29,19 @@ def products_list(request):
 
 @login_required
 def product_create(request):
+    business = request.user.get_business()
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             product = form.save(commit=False)
-            if request.user.business:
-                product.business = request.user.business
+            product.business = business
             product.save()
             messages.success(request, f"Product '{product.name}' created successfully.")
             return redirect('products_list')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.replace('_', ' ').title()}: {error}")
     else:
         form = ProductForm()
 
@@ -77,18 +81,21 @@ def product_delete(request, pk):
 
 @login_required
 def categories_list(request):
-    business = request.user.business
-    categories = Category.objects.filter(business=business) if business else Category.objects.all()
+    business = request.user.get_business()
+    categories = Category.objects.filter(business=business)
 
     if request.method == 'POST':
         form = CategoryForm(request.POST, request.FILES)
         if form.is_valid():
             cat = form.save(commit=False)
-            if business:
-                cat.business = business
+            cat.business = business
             cat.save()
             messages.success(request, "Category added successfully.")
             return redirect('categories_list')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.replace('_', ' ').title()}: {error}")
     else:
         form = CategoryForm()
 
@@ -97,18 +104,21 @@ def categories_list(request):
 
 @login_required
 def brands_list(request):
-    business = request.user.business
-    brands = Brand.objects.filter(business=business) if business else Brand.objects.all()
+    business = request.user.get_business()
+    brands = Brand.objects.filter(business=business)
 
     if request.method == 'POST':
         form = BrandForm(request.POST, request.FILES)
         if form.is_valid():
             b = form.save(commit=False)
-            if business:
-                b.business = business
+            b.business = business
             b.save()
             messages.success(request, "Brand added successfully.")
             return redirect('brands_list')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.replace('_', ' ').title()}: {error}")
     else:
         form = BrandForm()
 

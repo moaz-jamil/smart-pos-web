@@ -6,8 +6,8 @@ from authentication.models import User
 
 @login_required
 def employees_list(request):
-    business = request.user.business
-    employees = EmployeeProfile.objects.filter(business=business) if business else EmployeeProfile.objects.all()
+    business = request.user.get_business()
+    employees = EmployeeProfile.objects.filter(business=business)
 
     if request.method == 'POST':
         username = request.POST.get('username')

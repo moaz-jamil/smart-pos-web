@@ -12,17 +12,17 @@ from inventory.models import StockMovement
 
 @login_required
 def purchases_list(request):
-    business = request.user.business
-    purchases = Purchase.objects.filter(business=business).order_by('-created_at') if business else Purchase.objects.all().order_by('-created_at')
+    business = request.user.get_business()
+    purchases = Purchase.objects.filter(business=business).order_by('-created_at')
     return render(request, 'purchases/purchases_list.html', {'purchases': purchases})
 
 
 @login_required
 @transaction.atomic
 def purchase_create(request):
-    business = request.user.business
-    suppliers = Supplier.objects.filter(business=business) if business else Supplier.objects.all()
-    products = Product.objects.filter(business=business) if business else Product.objects.all()
+    business = request.user.get_business()
+    suppliers = Supplier.objects.filter(business=business)
+    products = Product.objects.filter(business=business)
 
     if request.method == 'POST':
         supplier_id = request.POST.get('supplier')

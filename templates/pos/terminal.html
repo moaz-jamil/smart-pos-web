@@ -12,7 +12,7 @@
             <div class="row g-2">
                 <div class="col-md-7">
                     <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+                        <span class="input-group-text bg-transparent border-secondary text-primary"><i class="bi bi-search"></i></span>
                         <input type="text" id="pos-search-input" class="form-control form-control-lg" placeholder="Scan Barcode or Search Product..." autofocus>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                             <i class="bi bi-box-seam fs-1"></i>
                         </div>
                         {% endif %}
-                        <div class="fw-bold text-light text-truncate" style="font-size: 0.875rem;">{{ p.name }}</div>
+                        <div class="fw-bold text-primary text-truncate" style="font-size: 0.875rem;">{{ p.name }}</div>
                         <div class="d-flex justify-content-between align-items-center mt-2">
                             <span class="fw-bold text-success">{{ currency_symbol }}{{ p.selling_price|floatformat:2 }}</span>
                             <span class="badge {% if p.is_low_stock %}bg-danger{% else %}bg-secondary{% endif %}">Qty: {{ p.stock_quantity }}</span>
@@ -93,14 +93,14 @@
             </div>
 
             <!-- Summary Breakdown -->
-            <div class="bg-dark p-3 rounded mb-3">
+            <div class="card card-custom p-3 rounded-3 mb-3 border-secondary bg-body-tertiary">
                 <div class="d-flex justify-content-between text-muted mb-1 small">
                     <span>Subtotal</span>
-                    <span id="summary-subtotal" class="fw-semibold text-light">{{ currency_symbol }}0.00</span>
+                    <span id="summary-subtotal" class="fw-semibold text-primary">{{ currency_symbol }}0.00</span>
                 </div>
                 <div class="d-flex justify-content-between text-muted mb-1 small">
                     <span>Tax Total ({{ tax_rate }}%)</span>
-                    <span id="summary-tax" class="fw-semibold text-light">{{ currency_symbol }}0.00</span>
+                    <span id="summary-tax" class="fw-semibold text-primary">{{ currency_symbol }}0.00</span>
                 </div>
                 <div class="d-flex justify-content-between text-muted mb-2 small">
                     <span>Discount</span>
@@ -117,7 +117,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary">
-                    <span class="fs-5 fw-bold text-light">TOTAL PAYABLE</span>
+                    <span class="fs-5 fw-bold text-primary">TOTAL PAYABLE</span>
                     <span id="summary-total" class="fs-3 fw-bold text-success">{{ currency_symbol }}0.00</span>
                 </div>
             </div>
@@ -259,16 +259,16 @@
 
             body.append(`
                 <tr>
-                    <td class="fw-semibold text-light">${item.name}</td>
+                    <td class="fw-semibold text-primary">${item.name}</td>
                     <td class="text-center">
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-dark border-secondary text-light px-2" onclick="updateCartQty(${item.id}, -1)">-</button>
-                            <span class="btn btn-dark border-secondary text-light px-2 fw-bold" style="pointer-events:none;">${item.quantity}</span>
-                            <button class="btn btn-dark border-secondary text-light px-2" onclick="updateCartQty(${item.id}, 1)">+</button>
+                            <button class="btn btn-sm btn-outline-secondary px-2" onclick="updateCartQty(${item.id}, -1)">-</button>
+                            <span class="btn btn-sm btn-outline-secondary px-2 fw-bold text-primary" style="pointer-events:none;">${item.quantity}</span>
+                            <button class="btn btn-sm btn-outline-secondary px-2" onclick="updateCartQty(${item.id}, 1)">+</button>
                         </div>
                     </td>
                     <td class="text-end text-muted">${item.price.toFixed(2)}</td>
-                    <td class="text-end fw-bold text-light">${itemSubtotal.toFixed(2)}</td>
+                    <td class="text-end fw-bold text-primary">${itemSubtotal.toFixed(2)}</td>
                     <td class="text-end"><button class="btn btn-sm text-danger" onclick="removeFromCart(${item.id})"><i class="bi bi-x-circle"></i></button></td>
                 </tr>
             `);
@@ -319,7 +319,7 @@
                         <div class="col-xl-3 col-md-4 col-sm-6">
                             <div class="product-card h-100" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, ${p.stock}, ${p.tax_rate})">
                                 ${imgHtml}
-                                <div class="fw-bold text-light text-truncate" style="font-size: 0.875rem;">${p.name}</div>
+                                <div class="fw-bold text-primary text-truncate" style="font-size: 0.875rem;">${p.name}</div>
                                 <div class="d-flex justify-content-between align-items-center mt-2">
                                     <span class="fw-bold text-success">{{ currency_symbol }}${p.price.toFixed(2)}</span>
                                     <span class="badge ${p.stock <= 5 ? 'bg-danger' : 'bg-secondary'}">Qty: ${p.stock}</span>

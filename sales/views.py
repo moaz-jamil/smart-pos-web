@@ -7,8 +7,8 @@ from inventory.models import StockMovement
 
 @login_required
 def sales_list(request):
-    business = request.user.business
-    sales = Sale.objects.filter(business=business).order_by('-created_at') if business else Sale.objects.all().order_by('-created_at')
+    business = request.user.get_business()
+    sales = Sale.objects.filter(business=business).order_by('-created_at')
     return render(request, 'sales/sales_list.html', {'sales': sales})
 
 
@@ -55,8 +55,8 @@ def sale_refund(request, pk):
 
 @login_required
 def coupons_list(request):
-    business = request.user.business
-    coupons = Coupon.objects.filter(business=business) if business else Coupon.objects.all()
+    business = request.user.get_business()
+    coupons = Coupon.objects.filter(business=business)
 
     if request.method == 'POST':
         code = request.POST.get('code', '').upper()

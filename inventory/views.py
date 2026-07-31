@@ -8,16 +8,16 @@ from products.models import Product
 
 @login_required
 def inventory_list(request):
-    business = request.user.business
-    movements = StockMovement.objects.filter(business=business).order_by('-created_at') if business else StockMovement.objects.all().order_by('-created_at')
+    business = request.user.get_business()
+    movements = StockMovement.objects.filter(business=business).order_by('-created_at')
     return render(request, 'inventory/inventory_list.html', {'movements': movements})
 
 
 @login_required
 @transaction.atomic
 def stock_movement_create(request):
-    business = request.user.business
-    products = Product.objects.filter(business=business) if business else Product.objects.all()
+    business = request.user.get_business()
+    products = Product.objects.filter(business=business)
 
     if request.method == 'POST':
         product_id = request.POST.get('product')
@@ -57,8 +57,8 @@ def stock_movement_create(request):
 
 @login_required
 def warehouses_list(request):
-    business = request.user.business
-    warehouses = Warehouse.objects.filter(business=business) if business else Warehouse.objects.all()
+    business = request.user.get_business()
+    warehouses = Warehouse.objects.filter(business=business)
 
     if request.method == 'POST':
         name = request.POST.get('name')

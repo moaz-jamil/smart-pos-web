@@ -6,18 +6,21 @@ from suppliers.forms import SupplierForm
 
 @login_required
 def suppliers_list(request):
-    business = request.user.business
-    suppliers = Supplier.objects.filter(business=business) if business else Supplier.objects.all()
+    business = request.user.get_business()
+    suppliers = Supplier.objects.filter(business=business)
 
     if request.method == 'POST':
         form = SupplierForm(request.POST)
         if form.is_valid():
             s = form.save(commit=False)
-            if business:
-                s.business = business
+            s.business = business
             s.save()
-            messages.success(request, f"Supplier '{s.company_name}' added.")
+            messages.success(request, f"Supplier '{s.company_name}' added successfully.")
             return redirect('suppliers_list')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.replace('_', ' ').title()}: {error}")
     else:
         form = SupplierForm()
 

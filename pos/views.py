@@ -15,11 +15,11 @@ from settings_app.models import BusinessSetting
 
 @login_required
 def pos_terminal_view(request):
-    business = request.user.business
-    products = Product.objects.filter(business=business, status=True) if business else Product.objects.filter(status=True)
-    categories = Category.objects.filter(business=business, status=True) if business else Category.objects.filter(status=True)
-    customers = Customer.objects.filter(business=business, status=True) if business else Customer.objects.filter(status=True)
-    setting = getattr(business, 'settings', None) if business else None
+    business = request.user.get_business()
+    products = Product.objects.filter(business=business, status=True)
+    categories = Category.objects.filter(business=business, status=True)
+    customers = Customer.objects.filter(business=business, status=True)
+    setting = getattr(business, 'settings', None)
 
     context = {
         'products': products,
@@ -35,8 +35,8 @@ def pos_product_search_api(request):
     query = request.GET.get('q', '').strip()
     category_id = request.GET.get('category_id')
 
-    business = request.user.business
-    products = Product.objects.filter(business=business, status=True) if business else Product.objects.filter(status=True)
+    business = request.user.get_business()
+    products = Product.objects.filter(business=business, status=True)
 
     if category_id:
         products = products.filter(category_id=category_id)
@@ -79,7 +79,7 @@ def pos_checkout_api(request):
         if not items:
             return JsonResponse({'status': 'error', 'message': 'Cart is empty'}, status=400)
 
-        business = request.user.business
+        business = request.user.get_business()
         customer = Customer.objects.filter(pk=customer_id).first() if customer_id else None
         coupon = Coupon.objects.filter(business=business, code=coupon_code, status=True).first() if coupon_code else None
 

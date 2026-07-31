@@ -6,9 +6,9 @@ from expenses.models import Expense, ExpenseCategory
 
 @login_required
 def expenses_list(request):
-    business = request.user.business
-    expenses = Expense.objects.filter(business=business).order_by('-expense_date') if business else Expense.objects.all().order_by('-expense_date')
-    categories = ExpenseCategory.objects.filter(business=business) if business else ExpenseCategory.objects.all()
+    business = request.user.get_business()
+    expenses = Expense.objects.filter(business=business).order_by('-expense_date')
+    categories = ExpenseCategory.objects.filter(business=business)
 
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -36,8 +36,8 @@ def expenses_list(request):
 
 @login_required
 def expense_categories(request):
-    business = request.user.business
-    categories = ExpenseCategory.objects.filter(business=business) if business else ExpenseCategory.objects.all()
+    business = request.user.get_business()
+    categories = ExpenseCategory.objects.filter(business=business)
 
     if request.method == 'POST':
         name = request.POST.get('name')

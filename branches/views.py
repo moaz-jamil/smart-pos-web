@@ -5,8 +5,8 @@ from branches.models import Branch
 
 @login_required
 def branches_list(request):
-    business = request.user.business
-    branches = Branch.objects.filter(business=business) if business else Branch.objects.all()
+    business = request.user.get_business()
+    branches = Branch.objects.filter(business=business)
 
     if request.method == 'POST':
         name = request.POST.get('name')

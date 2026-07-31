@@ -53,5 +53,14 @@ class User(AbstractUser):
     def is_customer(self):
         return self.role == self.ROLE_CUSTOMER
 
+    def get_business(self):
+        if not self.business:
+            b = Business.objects.first()
+            if not b:
+                b = Business.objects.create(name="SmartPOS Store")
+            self.business = b
+            self.save(update_fields=['business'])
+        return self.business
+
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"

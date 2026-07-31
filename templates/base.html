@@ -43,7 +43,7 @@
                 </a>
             </li>
 
-            <div class="nav-label">Core Operations</div>
+            <li class="nav-label">Core Operations</li>
             <li class="nav-item">
                 <a href="{% url 'sales_list' %}" class="nav-link {% if 'sales' in request.path %}active{% endif %}">
                     <i class="bi bi-receipt"></i>
@@ -69,7 +69,7 @@
                 </a>
             </li>
 
-            <div class="nav-label">People & Relations</div>
+            <li class="nav-label">People & Relations</li>
             <li class="nav-item">
                 <a href="{% url 'customers_list' %}" class="nav-link {% if 'customers' in request.path %}active{% endif %}">
                     <i class="bi bi-people-fill"></i>
@@ -84,7 +84,7 @@
             </li>
             
             {% if user.is_admin %}
-            <div class="nav-label">HRM & Financials</div>
+            <li class="nav-label">HRM & Financials</li>
             <li class="nav-item">
                 <a href="{% url 'employees_list' %}" class="nav-link {% if 'employees' in request.path %}active{% endif %}">
                     <i class="bi bi-person-badge-fill"></i>
@@ -123,7 +123,7 @@
             </li>
             {% endif %}
 
-            <div class="nav-label">System & Settings</div>
+            <li class="nav-label">System & Settings</li>
             {% if user.is_admin %}
             <li class="nav-item">
                 <a href="{% url 'branches_list' %}" class="nav-link {% if 'branches' in request.path %}active{% endif %}">
@@ -165,7 +165,7 @@
                 <button class="btn btn-outline-secondary d-md-none" id="toggle-sidebar">
                     <i class="bi bi-list"></i>
                 </button>
-                <div class="fw-semibold text-light fs-5">
+                <div class="fw-semibold text-primary fs-5">
                     {% block header_title %}{{ current_business.name|default:"SmartPOS Enterprise" }}{% endblock %}
                 </div>
             </div>
@@ -173,20 +173,20 @@
             <div class="d-flex align-items-center gap-3">
                 <!-- Notifications Dropdown -->
                 <div class="dropdown">
-                    <button class="btn btn-dark position-relative border-secondary rounded-circle p-2" type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-bell-fill fs-5 text-muted"></i>
+                    <button class="btn btn-outline-secondary position-relative rounded-circle p-2" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell-fill fs-5"></i>
                         {% if unread_notifications_count > 0 %}
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             {{ unread_notifications_count }}
                         </span>
                         {% endif %}
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-2" style="width: 320px;">
-                        <h6 class="dropdown-header border-bottom border-secondary pb-2 mb-2">Notifications</h6>
+                    <ul class="dropdown-menu dropdown-menu-end p-2 shadow-sm" style="width: 320px;">
+                        <h6 class="dropdown-header border-bottom pb-2 mb-2">Notifications</h6>
                         {% for notif in header_notifications %}
                         <li class="mb-2">
                             <a class="dropdown-item rounded small text-wrap p-2 bg-secondary bg-opacity-10" href="{% url 'notifications_list' %}">
-                                <div class="fw-bold text-light">{{ notif.title }}</div>
+                                <div class="fw-bold text-primary">{{ notif.title }}</div>
                                 <div class="text-muted" style="font-size: 0.8rem;">{{ notif.message|truncatewords:8 }}</div>
                             </a>
                         </li>
@@ -200,16 +200,16 @@
 
                 <!-- User Profile -->
                 <div class="dropdown">
-                    <button class="btn btn-dark d-flex align-items-center gap-2 border-secondary rounded-pill pe-3" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-outline-secondary d-flex align-items-center gap-2 rounded-pill pe-3" type="button" data-bs-toggle="dropdown">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 35px; height: 35px;">
                             {{ user.username|slice:":1"|upper }}
                         </div>
                         <div class="text-start d-none d-sm-block">
-                            <div class="fw-semibold text-light" style="font-size: 0.85rem; line-height: 1.2;">{{ user.get_full_name|default:user.username }}</div>
+                            <div class="fw-semibold text-primary" style="font-size: 0.85rem; line-height: 1.2;">{{ user.get_full_name|default:user.username }}</div>
                             <div class="text-muted" style="font-size: 0.725rem;">{{ user.get_role_display }}</div>
                         </div>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                         <li><a class="dropdown-item" href="{% url 'user_profile' %}"><i class="bi bi-person me-2"></i>My Profile</a></li>
                         {% if user.is_admin %}
                         <li><a class="dropdown-item" href="{% url 'settings_detail' %}"><i class="bi bi-sliders me-2"></i>Settings</a></li>
@@ -249,13 +249,20 @@
 
     <script>
         $(document).ready(function() {
-            // Initialize DataTables with Dark Theme Support
+            // Disable DataTables browser alert popups globally
+            if ($.fn.dataTable) {
+                $.fn.dataTable.ext.errMode = 'none';
+            }
+
+            // Initialize DataTables with Dark/Light Theme Support
             $('.datatable').DataTable({
                 responsive: true,
                 pageLength: 10,
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Search records..."
+                    searchPlaceholder: "Search records...",
+                    emptyTable: "No records found",
+                    zeroRecords: "No matching records found"
                 }
             });
         });

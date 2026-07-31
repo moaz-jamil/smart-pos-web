@@ -9,21 +9,21 @@ from employees.models import EmployeeProfile
 
 @login_required
 def payroll_list(request):
-    business = request.user.business
-    payrolls = Payroll.objects.filter(business=business).order_by('-year', '-month') if business else Payroll.objects.all().order_by('-year', '-month')
+    business = request.user.get_business()
+    payrolls = Payroll.objects.filter(business=business).order_by('-year', '-month')
     return render(request, 'payroll/payroll_list.html', {'payrolls': payrolls})
 
 
 @login_required
 def payroll_generate(request):
-    business = request.user.business
+    business = request.user.get_business()
     today = timezone.now().date()
 
     if request.method == 'POST':
         month = int(request.POST.get('month', today.month))
         year = int(request.POST.get('year', today.year))
 
-        employees = EmployeeProfile.objects.filter(business=business) if business else EmployeeProfile.objects.all()
+        employees = EmployeeProfile.objects.filter(business=business)
         created_count = 0
 
         for emp in employees:

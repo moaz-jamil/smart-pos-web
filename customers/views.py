@@ -6,18 +6,21 @@ from customers.forms import CustomerForm
 
 @login_required
 def customers_list(request):
-    business = request.user.business
-    customers = Customer.objects.filter(business=business) if business else Customer.objects.all()
+    business = request.user.get_business()
+    customers = Customer.objects.filter(business=business)
 
     if request.method == 'POST':
         form = CustomerForm(request.POST)
         if form.is_valid():
             c = form.save(commit=False)
-            if business:
-                c.business = business
+            c.business = business
             c.save()
             messages.success(request, f"Customer '{c.name}' added successfully.")
             return redirect('customers_list')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.replace('_', ' ').title()}: {error}")
     else:
         form = CustomerForm()
 
