@@ -16,12 +16,18 @@
                         {{ form.name }}
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label text-muted small fw-semibold">Barcode *</label>
-                        {{ form.barcode }}
+                        <label class="form-label text-muted small fw-semibold">Barcode</label>
+                        <div class="input-group">
+                            {{ form.barcode }}
+                            <button type="button" class="btn btn-outline-secondary" onclick="generateBarcode()" title="Generate Random Barcode"><i class="bi bi-upc-scan"></i></button>
+                        </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label text-muted small fw-semibold">SKU *</label>
-                        {{ form.sku }}
+                        <label class="form-label text-muted small fw-semibold">SKU</label>
+                        <div class="input-group">
+                            {{ form.sku }}
+                            <button type="button" class="btn btn-outline-secondary" onclick="generateSKU()" title="Generate SKU"><i class="bi bi-qr-code"></i></button>
+                        </div>
                     </div>
 
                     <div class="col-md-4">
@@ -46,14 +52,18 @@
                         {{ form.selling_price }}
                     </div>
                     <div class="col-md-3">
+                        <label class="form-label text-muted small fw-semibold">Calculated Margin</label>
+                        <div class="form-control bg-body-tertiary text-success fw-bold" id="margin-display">0.00%</div>
+                    </div>
+                    <div class="col-md-3">
                         <label class="form-label text-muted small fw-semibold">Tax Rate (%)</label>
                         {{ form.tax_rate }}
                     </div>
+
                     <div class="col-md-3">
                         <label class="form-label text-muted small fw-semibold">Discount Rate (%)</label>
                         {{ form.discount_rate }}
                     </div>
-
                     <div class="col-md-3">
                         <label class="form-label text-muted small fw-semibold">Stock Quantity</label>
                         {{ form.stock_quantity }}
@@ -62,7 +72,7 @@
                         <label class="form-label text-muted small fw-semibold">Minimum Stock Alert Level</label>
                         {{ form.min_stock_level }}
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label class="form-label text-muted small fw-semibold">Product Image</label>
                         {{ form.image }}
                     </div>
@@ -89,3 +99,37 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    function generateBarcode() {
+        const rand = Math.floor(100000000000 + Math.random() * 900000000000);
+        $('#id_barcode').val(rand);
+    }
+
+    function generateSKU() {
+        const prefix = 'PROD';
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        $('#id_sku').val(`${prefix}-${rand}`);
+    }
+
+    function calculateMargin() {
+        const cost = parseFloat($('#id_purchase_price').val()) || 0;
+        const sell = parseFloat($('#id_selling_price').val()) || 0;
+
+        if (cost > 0 && sell > 0) {
+            const margin = ((sell - cost) / sell) * 100;
+            const badgeClass = margin >= 0 ? 'text-success' : 'text-danger';
+            $('#margin-display').removeClass('text-success text-danger').addClass(badgeClass).text(`${margin.toFixed(2)}%`);
+        } else {
+            $('#margin-display').text('0.00%');
+        }
+    }
+
+    $(document).ready(function() {
+        calculateMargin();
+        $('#id_purchase_price, #id_selling_price').on('input change', calculateMargin);
+    });
+</script>
+{% endblock %}
+

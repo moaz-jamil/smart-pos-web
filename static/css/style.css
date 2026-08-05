@@ -1093,3 +1093,143 @@ h6, .h6 { font-size: 0.92rem; }
   opacity: 1;
   visibility: visible;
 }
+
+/* ============================================
+   POS TERMINAL & THERMAL RECEIPT ENHANCEMENTS
+   ============================================ */
+
+/* Thermal Receipt Printable Area */
+.receipt-paper {
+  width: 80mm;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 15px;
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  line-height: 1.3;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 12px;
+  border-bottom: 1px dashed #000;
+  padding-bottom: 8px;
+}
+
+.receipt-header h5 {
+  font-weight: 800;
+  margin-bottom: 2px;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.receipt-table {
+  width: 100%;
+  margin-bottom: 10px;
+  border-collapse: collapse;
+}
+
+.receipt-table th {
+  border-bottom: 1px dashed #000;
+  text-align: left;
+  padding: 3px 0;
+  font-size: 11px;
+}
+
+.receipt-table td {
+  padding: 4px 0;
+  vertical-align: top;
+  font-size: 11px;
+}
+
+.receipt-footer {
+  text-align: center;
+  border-top: 1px dashed #000;
+  padding-top: 8px;
+  margin-top: 10px;
+  font-size: 11px;
+}
+
+/* Print Specific Rules for 80mm & 58mm Receipt Printers */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #thermal-receipt-modal,
+  #thermal-receipt-modal * {
+    visibility: visible !important;
+  }
+  #thermal-receipt-modal {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .modal-header,
+  .modal-footer,
+  .btn-close {
+    display: none !important;
+  }
+  .receipt-paper {
+    box-shadow: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+/* POS Touchscreen & Hotkey Badge Utility Styles */
+.hotkey-badge {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--primary-500);
+  font-family: monospace;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.pos-action-btn {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.pos-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.held-sale-chip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.held-sale-chip:hover {
+  background: var(--primary-100);
+  border-color: var(--primary-400);
+}
+
+[data-theme="dark"] .held-sale-chip:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary-500);
+}
