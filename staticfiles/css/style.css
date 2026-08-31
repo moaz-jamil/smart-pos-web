@@ -1071,3 +1071,25 @@ h6, .h6 { font-size: 0.92rem; }
     padding: 2.5rem 2rem;
   }
 }
+
+/* ============================================
+   RESPONSIVE SIDEBAR & OVERLAY
+   ============================================ */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1035;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}

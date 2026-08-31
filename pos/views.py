@@ -16,9 +16,9 @@ from settings_app.models import BusinessSetting
 @login_required
 def pos_terminal_view(request):
     business = request.user.get_business()
-    products = Product.objects.filter(business=business, status=True)
-    categories = Category.objects.filter(business=business, status=True)
-    customers = Customer.objects.filter(business=business, status=True)
+    products = Product.objects.filter(business=business)
+    categories = Category.objects.filter(business=business)
+    customers = Customer.objects.filter(business=business)
     setting = getattr(business, 'settings', None)
 
     context = {
@@ -36,7 +36,7 @@ def pos_product_search_api(request):
     category_id = request.GET.get('category_id')
 
     business = request.user.get_business()
-    products = Product.objects.filter(business=business, status=True)
+    products = Product.objects.filter(business=business)
 
     if category_id:
         products = products.filter(category_id=category_id)
@@ -191,3 +191,35 @@ def pos_checkout_api(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@csrf_exempt
+def pos_quick_customer_api(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+    try:
+        data = json.loads(request.body)
+        name = data.get('name', '').strip()
+        phone = data.get('phone', '').strip()
+        email = data.get('email', '').strip()
+
+        if not name or not phone:
+            return JsonResponse({'status': 'error', 'message': 'Name and phone are required.'}, status=400)
+
+        business = request.user.get_business()
+        c = Customer.objects.create(
+            business=business,
+            name=name,
+            phone=phone,
+            email=email
+        )
+        return JsonResponse({
+            'status': 'success',
+            'id': c.id,
+            'name': c.name,
+            'phone': c.phone
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
