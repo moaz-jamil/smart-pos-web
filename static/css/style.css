@@ -819,9 +819,8 @@ h6, .h6 { font-size: 0.92rem; }
 .badge.bg-success,
 .badge.bg-info,
 .pos-btn *,
-.sidebar-brand span,
 .user-avatar {
-  color: #ffffff !important;
+    color: #ffffff !important;
 }
 
 /* Table & Card Text Contrast */
@@ -1232,4 +1231,97 @@ h6, .h6 { font-size: 0.92rem; }
 [data-theme="dark"] .held-sale-chip:hover {
   background: var(--bg-hover);
   border-color: var(--primary-500);
+}
+
+
+
+/* =========================================================
+   SMARTPOS BRAND / SIDEBAR FINAL FIX
+   ========================================================= */
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    white-space: nowrap;
+    min-height: var(--navbar-height);
+
+    /* Prevent inherited gradient text from affecting children */
+    -webkit-text-fill-color: initial;
+}
+
+/* Logo */
+.sidebar-brand-icon {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+}
+
+/* SmartPOS text */
+.sidebar-brand > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    color: var(--primary-600) !important;
+    -webkit-text-fill-color: var(--primary-600) !important;
+
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* Pro badge */
+.sidebar-brand > span .badge {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    background-color: var(--primary-500) !important;
+
+    font-size: 0.65rem;
+    font-weight: 700;
+
+    padding: 0.25rem 0.45rem;
+    line-height: 1.2;
+
+    white-space: nowrap;
+    border-radius: 0.375rem;
+}
+
+
+/* Open POS Terminal Button */
+.pos-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100%;
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #ffffff !important;
+
+    font-weight: 600 !important;
+    text-decoration: none !important;
+
+    padding: 0.7rem 1rem !important;
+    border-radius: 10px !important;
+
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+.pos-btn i,
+.pos-btn span {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+.pos-btn:hover {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #059669, #047857) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
 }
